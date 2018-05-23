@@ -2,6 +2,7 @@ import sys
 import os
 import requests
 from bs4 import BeautifulSoup
+from urllib.request import urlopen
 
 
 
@@ -12,6 +13,9 @@ def get_solved(user):
 	problems = []
 
 	table = soup.find(class_="table table-condensed")
+
+	if table is None:
+		return
 
 	for entity in table.find_all('td'):
 		#print(entity.get_text())
@@ -31,7 +35,10 @@ def get_tried(user):
 
 	problems = []
 
-	table = soup.find_all(class_="table")[1]
+	try:
+		table = soup.find_all(class_="table")[1]
+	except IndexError:
+		return problems
 
 	for entity in table.find_all('td'):
 		#print(entity.get_text())
@@ -48,10 +55,21 @@ def get_tried(user):
 def check_profile():
 	problem = sys.argv[1]
 
+	code = urlopen("http://www.spoj.com/problems/"+problem).code
+
+	if code >= 400:
+		print("Invalid problem code")
+		return
+
 	users = [line.rstrip('\n') for line in open('users.txt')]
-	for user in users:
-		
+	for user in users:	
+
 		solved = get_solved(user)
+
+		if solved is None:
+			print("User " + user + " doesn't exist.")
+			continue
+
 		tried = get_tried(user)
 
 		if problem in solved:
