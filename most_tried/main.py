@@ -52,13 +52,16 @@ def get_tried(user):
 
 
 def print_list():
-	num = sys.argv[1]
+	self_user = sys.argv[1]
+	num = int(sys.argv[2])
 
 	invalid_users = []
 
 	users = [line.rstrip('\n') for line in open('users.txt')]
 
 	dict1, dict2, dict3 = {}, {}, {}
+
+	already_solved = get_solved(self_user)
 
 	for user in users:	
 
@@ -91,6 +94,10 @@ def print_list():
 			else:
 				dict3[problem] = 1
 
+	counter = 0
+
+	list3 = []
+
 	for problem in dict3.keys():
 
 		num1, num2 = 0, 0
@@ -105,7 +112,24 @@ def print_list():
 		except KeyError:
 			num2 = 0
 
-		print(problem + ' - solved by ' + str(num1) + ' and tried by ' + str(num2) + '.')
+		if problem in already_solved:
+			continue
+
+		#print(problem + ' - solved by ' + str(num1) + ' and tried by ' + str(num2) + '.')
+
+		list3.append((num1 + num2, problem, num1))
+
+	list3.sort(key=lambda x: x[0], reverse=True)
+
+	for each in list3:
+
+		print(each[1] + ' - solved by ' + str(each[2]) +\
+		 ' and tried by ' + str(each[0] - each[2]) + '.')
+
+		counter += 1
+
+		if counter == num:
+			break
 
 	print()
 
